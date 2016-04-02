@@ -5,10 +5,6 @@ class GameReservation(models.Model):
 	player = models.ForeignKey(Player)
 	invitationId = models.CharField(max_length=10)
 	promotionId = models.BooleanField(default=True)
-	def __unicode__(self):
-		return 'token Id: '+self.tokenId+', invitation Id: '+self.invitaionId+', promotion Id: '+self.promotionId
-	def toString():
-		return "token Id: "
 
 class GameRequest(models.Model):
 	"""docstring for GameRequest"""

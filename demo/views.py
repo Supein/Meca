@@ -17,7 +17,6 @@ def gameReservation(request):
 		try:
 			player = Player.objects.get(tokenId=tokenId)
 		except ObjectDoesNotExist:
-			raise
 			player = Player(tokenId=tokenId)
 		storedReservation = GameReservation(player=player, invitationId=invitationId, promotionId=promotionId)
 		storedReservation.save()

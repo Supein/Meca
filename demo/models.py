@@ -1,6 +1,5 @@
 from django.db import models
 from datetime import timedelta
-from django.utils import timezone
 
 class Player(models.Model):
 	token = models.CharField(max_length=10,  primary_key=True)

@@ -1,8 +1,14 @@
 from django.db import models
+from datetime import timedelta
+from django.utils import timezone
+
+class Player(models.Model):
+	token = models.CharField(max_length=10,  primary_key=True)
+	creationDate = models.DateField(auto_now_add = True)
 
 class GameReservation(models.Model):
 	"""docstring for GameReservation"""
-	player = models.ForeignKey(Player)
+	player = models.ForeignKey(Player, null=True)
 	invitationId = models.CharField(max_length=10)
 	promotionId = models.BooleanField(default=True)
 
@@ -11,43 +17,28 @@ class GameRequest(models.Model):
 	validationId = models.CharField(max_length=10)
 	invitaionId = models.CharField(max_length=10)
 
-class Player(models.Model):
-	token = models.CharField(max_length=10,  primary_key=True)
-	creationDate = models.DateField(default=datetime.now())
+	def isEligible():
+		try:
+			game = Game.objects.get(request=self)
+			return game.isActive()
+		except ObjectDoesNotExist:
+			try:
+				reservation = GameReservation.objects.get(invitaionId = self.invitaionId)
+				return True
+			except ObjectDoesNotExist:
+				return False
+	def getGame():
+		try:
+			return Game.objects.get(request=self)
+		except ObjectDoesNotExist:
+			return null
+
+
 
 class Image(models.Model):
 	"""docstring for Image"""
 	solution = models.CharField(max_length=12)
 	rawFile = models.ImageField(upload_to='rawImages/')
-		
-class ImageChallenge(models.Model):
-	"""docstring for ImageChallenge"""
-	image = models.ForeignKey(Image)
-	game = models.ForeignKey(Game)
-
-	startTime = models.DateField(default=datetime.now())
-	timeout = timedelta(seconds=20)
-	endTime = models.DateField(default=Field.null)
-
-	def isActive():
-		if endTime != null:
-			return false
-		else if !self.game.isActive():
-			self.end()
-			return false
-		else if datetime.now()>(self.startTime+timeout):
-			self.end()
-			return false
-		else:
-			return true
-	def getImage():
-		if self.isActive():
-			return self.image
-		else
-			return null
-	def end()
-		self.endTime = datetime.now()
-		
 
 class Game(models.Model):
 	"""docstring for ImageChallenge"""
@@ -55,28 +46,59 @@ class Game(models.Model):
 	request = models.ForeignKey(GameRequest)
 	reservation = models.ForeignKey(GameReservation)
 
-	startTime = models.DateField(default=datetime.now())
+	startTime = models.DateField(auto_now_add = True)
 	timeout = timedelta(seconds=60)
-	endTime = models.DateField(default=Field.null)
+	endTime = models.DateField()
 
-	activeChallenge = models.ForeignKey(ImageChallenge)
+	activeChallenge = models.ForeignKey('ImageChallenge', null=True)
 
 	def isActive():
 		if endTime != null:
-			return false
-		else if datetime.now() > (self.startTime + timeout):
+			return False
+		elif datetime.now() > (self.startTime + timeout):
 			self.end()
-			return false
+			return False
 		else:
-			return true
+			return True
 
 	def getImage():
 		if self.activeChallenge != null:
 			return self.activeChallenge.getImage()
 
-	def end()
-		self.endTime = datetime.now()
+	def end():
+		self.endTime = timezone.now()
 		self.activeChallenge.end()
+		
+class ImageChallenge(models.Model):
+	"""docstring for ImageChallenge"""
+	image = models.ForeignKey(Image)
+	parentGame = models.ForeignKey(Game)
+
+	startTime = models.DateField(auto_now_add = True)
+	timeout = timedelta(seconds=20)
+	endTime = models.DateField()
+
+	def isActive():
+		if endTime != null:
+			return False
+		elif not self.parentGame.isActive():
+			self.end()
+			return False
+		elif datetime.now()>(self.startTime+timeout):
+			self.end()
+			return False
+		else:
+			return True
+	def getImage():
+		if self.isActive():
+			return self.image
+		else:
+			return null
+	def end():
+		self.endTime = timezone.now()
+		
+
+
 
 
 

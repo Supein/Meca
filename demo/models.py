@@ -12,15 +12,15 @@ class GameRequest(models.Model):
 	invitaionId = models.CharField(max_length=10)
 
 class Player(models.Model):
-	tokenId = models.CharField(max_length=10,  primary_key=True)
+	token = models.CharField(max_length=10,  primary_key=True)
 	creationDate = models.DateField(default=datetime.now())
 
 class Image(models.Model):
 	"""docstring for Image"""
 	solution = models.CharField(max_length=12)
-	rawFile = models.FileField(upload_to='rawImages/')
+	rawFile = models.ImageField(upload_to='rawImages/')
 		
-class ImageChallenge(object):
+class ImageChallenge(models.Model):
 	"""docstring for ImageChallenge"""
 	image = models.ForeignKey(Image)
 	game = models.ForeignKey(Game)
@@ -28,6 +28,7 @@ class ImageChallenge(object):
 	startTime = models.DateField(default=datetime.now())
 	timeout = timedelta(seconds=20)
 	endTime = models.DateField(default=Field.null)
+
 	def isActive():
 		if endTime != null:
 			return false
@@ -39,11 +40,18 @@ class ImageChallenge(object):
 			return false
 		else:
 			return true
+	def getImage():
+		if self.isActive():
+			return self.image
+		else
+			return null
 	def end()
 		self.endTime = datetime.now()
 		
 
 class Game(models.Model):
+	"""docstring for ImageChallenge"""
+	token = models.CharField(max_length=20,  primary_key=True)
 	request = models.ForeignKey(GameRequest)
 	reservation = models.ForeignKey(GameReservation)
 
@@ -61,6 +69,10 @@ class Game(models.Model):
 			return false
 		else:
 			return true
+
+	def getImage():
+		if self.activeChallenge != null:
+			return self.activeChallenge.getImage()
 
 	def end()
 		self.endTime = datetime.now()

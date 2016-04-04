@@ -8,4 +8,5 @@ urlpatterns = [
 
     url(r'reserve', views.gameReservation),
     url(r'request', views.gameRequest),
+    url(r'currentImage', views.getImage),
 ]

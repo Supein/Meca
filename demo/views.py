@@ -32,12 +32,14 @@ def gameRequest(request):
 		storedRequest.save()
 		if storedRequest.isEligible():
 			game = storedRequest.getGame()
+			if game == null:
+				game = Game(request=storedRequest, reservation=storedRequest.getReservation())
 			template = loader.get_template('template.html')
-    		context = {
-        		'gameToken': game.token,
-    		}
-    		return HttpResponse(template.render(context, request))
-		else
+			context = {
+				'gameToken': game.token,
+			}
+			return HttpResponse(template.render(context, request))
+		else:
 			response.status_code = 401
 	else:
 		response.status_code = 400
@@ -48,7 +50,8 @@ def getPlayer(request):
 	try:
 		player = Player.objects.get(token=token)
 	except ObjectDoesNotExist:
-		player = Player(tokenId=token)
+		player = Player(token=token)
+		player.save()
 	return player
 
 def getImage(request):
@@ -56,12 +59,12 @@ def getImage(request):
 	game = getActiveGame(request)
 	if game != null and game.getImage() != null:
 		img = game.getImage
-	    wrapper = FileWrapper(open(img.file))
-	    content_type = mimetypes.guess_type(filename)[0]
-	    response = HttpResponse(wrapper,content_type=content_type)  
-	    response['Content-Length']      = os.path.getsize(img.file)    
-	    response['Content-Disposition'] = "attachment; filename=CurrentImage"
-	    response.status_code = 200
+		wrapper = FileWrapper(open(img.file))
+		content_type = mimetypes.guess_type(filename)[0]
+		response = HttpResponse(wrapper,content_type=content_type)  
+		response['Content-Length']      = os.path.getsize(img.file)    
+		response['Content-Disposition'] = "attachment; filename=CurrentImage"
+		response.status_code = 200
 	else:
 		response.status_code = 401
 	return response

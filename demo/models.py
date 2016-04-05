@@ -21,14 +21,16 @@ class GameRequest(models.Model):
 			game = Game.objects.get(request=self)
 			return game.isActive()
 		except ObjectDoesNotExist:
-			try:
-				reservation = GameReservation.objects.get(invitaionId = self.invitaionId)
-				return True
-			except ObjectDoesNotExist:
-				return False
+			return self.getReservation != null
+			
 	def getGame():
 		try:
 			return Game.objects.get(request=self)
+		except ObjectDoesNotExist:
+			return null
+	def getReservation():
+		try:
+			return GameReservation.objects.get(invitaionId = self.invitaionId)
 		except ObjectDoesNotExist:
 			return null
 

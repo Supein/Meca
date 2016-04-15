@@ -17,17 +17,14 @@ class GameRequest(models.Model):
 	invitaionId = models.CharField(max_length=10)
 
 	def isEligible():
-		try:
-			game = Game.objects.get(request=self)
-			return game.isActive()
-		except ObjectDoesNotExist:
-			return self.getReservation != null
+		return (self.getGame() != null and self.getGame.isActive()) or (self.getGame() == null and self.getReservation()!=null)
 			
 	def getGame():
 		try:
 			return Game.objects.get(request=self)
 		except ObjectDoesNotExist:
 			return null
+
 	def getReservation():
 		try:
 			return GameReservation.objects.get(invitaionId = self.invitaionId)
@@ -50,6 +47,7 @@ class Game(models.Model):
 	startTime = models.DateField(auto_now_add = True)
 	timeout = timedelta(seconds=60)
 	endTime = models.DateField()
+	remainingChallenges = 1
 
 	activeChallenge = models.ForeignKey('ImageChallenge', null=True)
 
@@ -65,10 +63,26 @@ class Game(models.Model):
 	def getImage():
 		if self.activeChallenge != null:
 			return self.activeChallenge.getImage()
+	def check():
+		return True
 
 	def end():
 		self.endTime = timezone.now()
-		self.activeChallenge.end()
+		if self.activeChallenge !=null:
+			self.activeChallenge.end()
+
+	def challengeDidEnd(challenge):
+		if challenge == self.activeChallenge:
+			if self.remainingChallenges > 0:
+				self.activeChallenge = self.getNewChallenge()
+	def getNewChallenge():
+		if self.remainingChallenges == Game.remainingChallenges:
+			pass
+		img = Image.objects.order_by('?').first()
+		self.activeChallenge=ImageChallenge(Image=img,parentGame=self)
+		self.remainingChallenges -= 1
+
+
 		
 class ImageChallenge(models.Model):
 	"""docstring for ImageChallenge"""
@@ -97,6 +111,7 @@ class ImageChallenge(models.Model):
 			return null
 	def end():
 		self.endTime = timezone.now()
+		self.parentGame.challengeDidEnd(self)
 		
 
 

@@ -2,6 +2,7 @@ from django.shortcuts import render
 from django.core.exceptions import ObjectDoesNotExist
 
 from django.http import HttpResponse
+from django.http import JsonResponse
 from django.template import loader
 from demo.models import *
 
@@ -36,7 +37,8 @@ def gameRequest(request):
 				game = Game(request=storedRequest, reservation=storedRequest.getReservation())
 			template = loader.get_template('template.html')
 			context = {
-				'gameToken': game.token,
+				# 'gameToken': game.token,
+				'gameToken': 7,
 			}
 			return HttpResponse(template.render(context, request))
 		else:
@@ -70,7 +72,20 @@ def getImage(request):
 	return response
 
 def check(request):
-	response=HttpResponse()
+	response_data = {}
+	if getActiveGame(request):
+		solution = request.REQUEST.get('solution','')
+		if solution == '':
+			response_data['match'] = False
+		else:
+			game = getActiveGame(request)
+			response_data['match'] = game.check(solution)
+			response_data['game'] = game.json()
+			response_data['hint'] = game.hint()
+	else:
+		response_data['match'] = False
+	return JsonResponse(response_data)
+
 
 def getActiveGame(request):
 	gameToken=request.REQUEST.get('gameToken','')

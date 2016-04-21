@@ -71,7 +71,7 @@ def getImage(request):
 		response.status_code = 401
 	return response
 
-def check(request):
+def checkSolution(request):
 	response_data = {}
 	if getActiveGame(request):
 		solution = request.REQUEST.get('solution','')
@@ -79,7 +79,7 @@ def check(request):
 			response_data['match'] = False
 		else:
 			game = getActiveGame(request)
-			response_data['match'] = game.check(solution)
+			response_data['match'] = game.checkSolution(solution)
 			response_data['game'] = game.json()
 			response_data['hint'] = game.hint()
 	else:

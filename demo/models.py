@@ -63,7 +63,7 @@ class Game(models.Model):
 	def getImage():
 		if self.activeChallenge != null:
 			return self.activeChallenge.getImage()
-	def check():
+	def checkSolution(solution):
 		return True
 
 	def end():

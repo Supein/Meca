@@ -9,5 +9,5 @@ urlpatterns = [
     url(r'reserve', views.gameReservation),
     url(r'request', views.gameRequest),
     url(r'currentImage', views.getImage),
-    url(r'check', views.check),
+    url(r'check', views.checkSolution),
 ]
